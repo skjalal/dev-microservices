@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: mssc-beer-service
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MYSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  sql:
+    init:
+      mode: embedded
+      platform: h2
+  jpa:
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  jackson:
+    default-property-inclusion: non_null
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
+  h2:
+    console:
+      enabled: true
+  artemis:
+    broker-url: tcp://localhost:61616
+    user: artemis
+    password: artemis
+server:
+  port: 8080
+app:
+  brewery:
+    inventory-api: http://localhost:8082
+logging:
+  level:
+    com.example.msscbeerservice: debug
+    org.apache.activemq: warn

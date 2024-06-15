@@ -1,0 +1,53 @@
+= RESTful Beer API Specification
+Developer;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+
+Sample application demonstrating how to use Spring REST Docs with JUnit 5.
+
+`BeerControllerTest` makes a call to a very simple service and produces three
+documentation snippets.
+
+== Fetch empty list data
+
+A `GET` request is sued to fetch beer but no records found.
+
+operation::empty-list[snippets='curl-request,http-request,http-response,response-fields']
+
+== Fetch all beer details
+
+A `GET` request is used to find all beer.
+
+operation::beer-list[snippets='curl-request,http-request,http-response,response-fields']
+
+== Fetch all beer details by page details
+
+A `GET` request is used to find all beer by pages.
+
+operation::paged-list[snippets='curl-request,http-request,http-response,response-fields']
+
+== Find a beer by id
+
+A `GET` request is used to find a new beer by id.
+
+operation::get-beer-by-id[snippets='curl-request,http-request,query-parameters,path-parameters,http-response,response-fields']
+
+== Find a beer by upc
+
+A `GET` request is used to find a new beer by upc.
+
+operation::get-beer-by-upc[snippets='curl-request,http-request,path-parameters,http-response,response-fields']
+
+== Save a new beer
+
+A `POST` request is used to save new beer.
+
+operation::save-new-beer[snippets='curl-request,http-request,request-fields,http-response,response-fields']
+
+== Update existing beer
+
+A `PUT` request is used to update existing beer.
+
+operation::update-beer[snippets='curl-request,http-request,request-fields,path-parameters,http-response']

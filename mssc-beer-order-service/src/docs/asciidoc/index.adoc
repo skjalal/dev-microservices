@@ -1,0 +1,44 @@
+= RESTful BeerOrder API Specification
+Developer;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+
+Sample application demonstrating how to use Spring REST Docs with JUnit 5.
+
+`CustomerControllerTest` makes a call to a very simple service and produces three
+documentation snippets.
+
+== Fetch all customer details by page details
+
+A `GET` request is used to find all customers by pages.
+
+operation::get-customers[snippets='curl-request,http-request,http-response,response-fields']
+
+`BeerOrderControllerTest` makes a call to a very simple service and produces three
+documentation snippets.
+
+== Fetch all beer orders details by page details
+
+A `GET` request is used to find all beer order by pages.
+
+operation::get-beer-orders[snippets='curl-request,http-request,path-parameters,query-parameters,http-response,response-fields']
+
+== Place beer order
+
+A `POST` request is used to place beer order.
+
+operation::place-order[snippets='curl-request,http-request,path-parameters,request-body,request-fields,http-response,response-body,response-fields']
+
+== Get beer order
+
+A `GET` request is used to fetch beer order.
+
+operation::get-order[snippets='curl-request,http-request,path-parameters,http-response,response-body,response-fields']
+
+== Pickup beer order
+
+A `PUT` request is used to pickup beer order.
+
+operation::pickup-order[snippets='curl-request,http-request,path-parameters,http-response']

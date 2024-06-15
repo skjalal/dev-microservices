@@ -1,0 +1,15 @@
+= RESTful BeerInventory API Specification
+Developer;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+
+Sample application demonstrating how to use Spring REST Docs with JUnit 5.
+
+`BeerInventoryControllerTest` makes a call to a very simple service and produces three
+documentation snippets.
+
+== Fetch Beer Inventory details by beer ID
+
+operation::get-inventory[snippets='curl-request,http-request,path-parameters,http-response,response-fields']
