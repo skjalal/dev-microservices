@@ -1,6 +1,8 @@
 spring:
   application:
-    name: mssc-beer-service
+    name: beer-service
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;MODE=MYSQL;DB_CLOSE_DELAY=-1

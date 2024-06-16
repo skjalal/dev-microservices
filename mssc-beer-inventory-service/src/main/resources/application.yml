@@ -1,6 +1,8 @@
 spring:
   application:
-    name: mssc-beer-inventory-service
+    name: inventory-service
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
