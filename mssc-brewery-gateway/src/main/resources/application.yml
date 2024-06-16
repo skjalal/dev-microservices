@@ -5,16 +5,20 @@ spring:
     gateway:
       routes:
         - id: beer-service
-          uri: http://localhost:8080
+          uri: lb://beer-service
           predicates:
             - Path=/api/v1/beer,/api/v1/beer/*
         - id: order-service
-          uri: http://localhost:8081
+          uri: lb://order-service
           predicates:
             - Path=/api/v1/customers,/api/v1/customers/**
         - id: inventory-service
-          uri: http://localhost:8082
+          uri: lb://inventory-service
           predicates:
             - Path=/api/v1/beer/*/inventory
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: true
 server:
   port: 9090
