@@ -2,7 +2,7 @@ package com.example.beerorderservice.services.impl;
 
 import static com.example.beerorderservice.domain.BeerOrderStatusEnum.VALIDATED;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,11 +12,9 @@ import com.example.beerorderservice.domain.BeerOrderEventEnum;
 import com.example.beerorderservice.domain.BeerOrderStatusEnum;
 import com.example.beerorderservice.repositories.BeerOrderRepository;
 import com.example.beerorderservice.services.BeerOrderManager;
-import com.example.beerorderservice.sm.BeerOrderStateChangeInterceptor;
 import com.example.brewery.models.BeerOrderDTO;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.access.StateMachineAccess;
-import org.springframework.statemachine.access.StateMachineAccessor;
-import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.service.StateMachineService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -44,27 +40,18 @@ class BeerOrderManagerImplTest {
   BeerOrderManager beerOrderManager;
 
   @MockBean
-  StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
+  StateMachineService<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineService;
 
   @MockBean
   BeerOrderRepository beerOrderRepository;
 
-  @MockBean
-  BeerOrderStateChangeInterceptor interceptor;
-
   @Mock
   StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> sm;
-
-  @Mock
-  StateMachineAccessor<BeerOrderStatusEnum, BeerOrderEventEnum> asm;
-
-  Consumer<StateMachineAccess<BeerOrderStatusEnum, BeerOrderEventEnum>> sma;
 
   BeerOrderDTO beerOrderDTO;
 
   @BeforeEach
   void setUp() {
-    sma = csma -> csma.addStateMachineInterceptor(interceptor);
     beerOrderDTO = BeerOrderDTO.builder().id(UUID.randomUUID()).build();
   }
 
@@ -72,11 +59,7 @@ class BeerOrderManagerImplTest {
   void testProcessValidationResult() {
     BeerOrder beerOrder = BeerOrder.builder().id(UUID.randomUUID()).orderStatus(VALIDATED).build();
     doReturn(Optional.of(beerOrder)).when(beerOrderRepository).findById(any(UUID.class));
-    doReturn(sm).when(stateMachineFactory).getStateMachine(any(UUID.class));
-    doReturn(Mono.empty()).when(sm).stopReactively();
-    doReturn(asm).when(sm).getStateMachineAccessor();
-    doNothing().when(asm).doWithAllRegions(sma);
-    doReturn(Mono.empty()).when(sm).startReactively();
+    doReturn(sm).when(stateMachineService).acquireStateMachine(anyString());
     doReturn(Flux.empty()).when(sm).sendEvent(ArgumentMatchers.<Mono<Message<BeerOrderEventEnum>>>any());
 
     beerOrderManager.processValidationResult(UUID.randomUUID(), true);

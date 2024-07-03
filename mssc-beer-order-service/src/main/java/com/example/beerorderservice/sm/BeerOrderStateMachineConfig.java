@@ -31,8 +31,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.persist.StateMachineRuntimePersister;
 
 @Configuration
 @EnableStateMachineFactory
@@ -45,6 +47,7 @@ public class BeerOrderStateMachineConfig extends
   private final Action<BeerOrderStatusEnum, BeerOrderEventEnum>  validationFailureAction;
   private final Action<BeerOrderStatusEnum, BeerOrderEventEnum>  allocationFailureAction;
   private final Action<BeerOrderStatusEnum, BeerOrderEventEnum>  deAllocateOrderAction;
+  private final StateMachineRuntimePersister<BeerOrderStatusEnum, BeerOrderEventEnum, String> stateMachinePersist;
 
   @Override
   public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states)
@@ -81,5 +84,12 @@ public class BeerOrderStateMachineConfig extends
         .source(ALLOCATED).target(PICKED_UP).event(BEERORDER_PICKED_UP)
         .and().withExternal()
         .source(ALLOCATED).target(CANCELLED).event(CANCEL_ORDER).action(deAllocateOrderAction);
+  }
+
+  @Override
+  public void configure(
+      StateMachineConfigurationConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> config)
+      throws Exception {
+    config.withPersistence().runtimePersister(stateMachinePersist);
   }
 }

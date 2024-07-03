@@ -7,7 +7,6 @@ import com.example.beerorderservice.domain.BeerOrderEventEnum;
 import com.example.beerorderservice.domain.BeerOrderStatusEnum;
 import com.example.beerorderservice.repositories.BeerOrderRepository;
 import com.example.beerorderservice.services.BeerOrderManager;
-import com.example.beerorderservice.sm.BeerOrderStateChangeInterceptor;
 import com.example.brewery.models.BeerOrderDTO;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,8 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.statemachine.support.DefaultStateMachineContext;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -27,9 +25,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BeerOrderManagerImpl implements BeerOrderManager {
 
-  private final StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
   private final BeerOrderRepository beerOrderRepository;
-  private final BeerOrderStateChangeInterceptor interceptor;
+  private final StateMachineService<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineService;
 
   @Override
   public BeerOrder newBeerOrder(BeerOrder beerOrder) {
@@ -143,25 +140,12 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
   }
 
   private void sendBeerOrderEvent(BeerOrder beerOrder, BeerOrderEventEnum eventEnum) {
-    StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> sm = build(beerOrder);
+    StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> sm = stateMachineService.acquireStateMachine(
+        String.valueOf(beerOrder.getId()));
     Message<BeerOrderEventEnum> message = MessageBuilder.withPayload(eventEnum)
         .setHeader(ORDER_ID_HEADER, beerOrder.getId().toString()).build();
 
     log.debug("Sending event: {} of status: {}", eventEnum, beerOrder.getOrderStatus());
     sm.sendEvent(Mono.just(message)).subscribe();
-  }
-
-  private StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> build(BeerOrder beerOrder) {
-    StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> sm = stateMachineFactory.getStateMachine(
-        beerOrder.getId());
-    sm.stopReactively().subscribe();
-    sm.getStateMachineAccessor().doWithAllRegions(asm -> {
-      asm.addStateMachineInterceptor(interceptor);
-      asm.resetStateMachineReactively(
-              new DefaultStateMachineContext<>(beerOrder.getOrderStatus(), null, null, null))
-          .subscribe();
-    });
-    sm.startReactively().subscribe();
-    return sm;
   }
 }
