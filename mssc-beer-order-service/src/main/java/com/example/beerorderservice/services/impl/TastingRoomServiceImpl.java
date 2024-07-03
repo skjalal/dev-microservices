@@ -14,11 +14,13 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Profile(value = {"local"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class TastingRoomServiceImpl implements TastingRoomService {
 

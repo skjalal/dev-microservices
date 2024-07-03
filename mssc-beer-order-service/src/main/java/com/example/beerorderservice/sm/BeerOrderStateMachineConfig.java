@@ -27,14 +27,17 @@ import com.example.beerorderservice.domain.BeerOrderStatusEnum;
 import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
-import org.springframework.statemachine.persist.StateMachineRuntimePersister;
+import org.springframework.statemachine.service.DefaultStateMachineService;
+import org.springframework.statemachine.service.StateMachineService;
 
 @Configuration
 @EnableStateMachineFactory
@@ -47,7 +50,7 @@ public class BeerOrderStateMachineConfig extends
   private final Action<BeerOrderStatusEnum, BeerOrderEventEnum>  validationFailureAction;
   private final Action<BeerOrderStatusEnum, BeerOrderEventEnum>  allocationFailureAction;
   private final Action<BeerOrderStatusEnum, BeerOrderEventEnum>  deAllocateOrderAction;
-  private final StateMachineRuntimePersister<BeerOrderStatusEnum, BeerOrderEventEnum, String> stateMachinePersist;
+  private final BeerOrderStateChangeInterceptor persistInterceptor;
 
   @Override
   public void configure(StateMachineStateConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> states)
@@ -90,6 +93,12 @@ public class BeerOrderStateMachineConfig extends
   public void configure(
       StateMachineConfigurationConfigurer<BeerOrderStatusEnum, BeerOrderEventEnum> config)
       throws Exception {
-    config.withPersistence().runtimePersister(stateMachinePersist);
+    config.withPersistence().runtimePersister(persistInterceptor);
+  }
+
+  @Bean
+  public StateMachineService<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineService(
+      StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory) {
+    return new DefaultStateMachineService<>(stateMachineFactory, persistInterceptor);
   }
 }
