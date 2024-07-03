@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Profile(value = {"local"})
+@Profile(value = {"dev"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class TastingRoomServiceImpl implements TastingRoomService {
 

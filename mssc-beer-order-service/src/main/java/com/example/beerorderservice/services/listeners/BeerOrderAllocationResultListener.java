@@ -8,6 +8,7 @@ import com.example.brewery.events.AllocateOrderResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
@@ -17,10 +18,11 @@ import org.springframework.stereotype.Component;
 public class BeerOrderAllocationResultListener {
 
   private final BeerOrderManager beerOrderManager;
+  private final Environment environment;
 
   @JmsListener(destination = ALLOCATE_ORDER_RESPONSE_QUEUE)
   public void listen(AllocateOrderResult result) {
-    CommonUtils.sleep(500L);
+    CommonUtils.sleep(500L, environment);
     if (result.getAllocationError().equals(Boolean.TRUE)) {
       //allocation error
       beerOrderManager.beerOrderAllocationFailed(result.getBeerOrderDTO());

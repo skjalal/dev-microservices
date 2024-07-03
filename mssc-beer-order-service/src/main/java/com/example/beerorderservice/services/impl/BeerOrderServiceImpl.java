@@ -7,6 +7,7 @@ import com.example.beerorderservice.repositories.BeerOrderRepository;
 import com.example.beerorderservice.repositories.CustomerRepository;
 import com.example.beerorderservice.services.BeerOrderManager;
 import com.example.beerorderservice.services.BeerOrderService;
+import com.example.beerorderservice.utils.CommonUtils;
 import com.example.beerorderservice.web.mappers.BeerOrderMapper;
 import com.example.brewery.models.BeerOrderDTO;
 import com.example.brewery.models.BeerOrderPagedList;
@@ -51,7 +52,7 @@ public class BeerOrderServiceImpl implements BeerOrderService {
     beerOrder.getBeerOrderLines().forEach(line -> line.setBeerOrder(beerOrder));
     BeerOrder savedBeerOrder = beerOrderManager.newBeerOrder(beerOrder);
     log.debug("Saved Beer Order: {}", savedBeerOrder.getId());
-    return beerOrderMapper.beerOrderToDto(savedBeerOrder);
+    return beerOrderMapper.beerOrderToDto(CommonUtils.waitForLatest(beerOrderRepository, savedBeerOrder, customer));
   }
 
   @Override

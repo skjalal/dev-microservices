@@ -9,6 +9,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +19,12 @@ import org.springframework.stereotype.Component;
 public class ValidationResultListener {
 
   private final BeerOrderManager beerOrderManager;
+  private final Environment environment;
 
   @JmsListener(destination = VALIDATE_ORDER_RESPONSE_QUEUE)
   public void listen(ValidateOrderResult result) {
     final UUID orderId = result.getOrderId();
-    CommonUtils.sleep(500L);
+    CommonUtils.sleep(500L, environment);
     log.debug("Validation result for order id: {}", orderId);
     beerOrderManager.processValidationResult(orderId, result.getIsValid());
   }
